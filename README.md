@@ -1,4 +1,61 @@
-# Interview Test (QA) - Mobile Banking
+# QA Interview Task - Mobile App Testing
+
+## 1. Introduction
+
+This document outlines the test plan for the fintech mobile wallet application [Download here](https://i.diawi.com/p6w66P):. The objective is to ensure that the app functions correctly by performing manual and automated testing of its core features.
+
+## 2. Scope
+
+This test plan covers functional and UI testing for the mobile wallet app, focusing on:
+
+- Account Details
+- View Transactions
+- UI validation
+
+## 3. Testing Approach
+
+### 3.1 Manual Testing
+
+Manual test cases will be created in an Excel sheet to verify core functionalities, UI consistency, and error handling.
+
+### 3.2 Automated Testing
+
+Automation will be performed using Appium with Java or Python for the following workflows:
+
+- Account Details
+- View Transactions
+
+## 4. Test Scenarios
+
+### 4.1 UI Testing
+
+- Ensure all UI elements are properly aligned and responsive.
+- Validate error messages and alerts are displayed correctly.
+- Verify that the app adapts to different screen sizes.
+
+## 5. Test Environment
+
+### 5.1 Tools
+
+- Excel for manual test cases
+- Screen recording tools for bug reporting
+
+## 6. Bug Reporting
+
+Bugs and inconsistencies will be documented with:
+
+- Description of the issue
+- Steps to reproduce
+- Expected vs. actual behavior
+- Device details
+- Screenshots/videos
+
+## 7. Deliverables
+
+1. Test Plan Document (this document)
+2. Manual Test Cases (Excel file)
+3. Automated Test Scripts
+4. Bug Report with device details and screenshots
 
 # Setting Up and Running a Flutter App Locally Using Flutter Environment Manager (FVM)
 

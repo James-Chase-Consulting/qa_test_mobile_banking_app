@@ -13,6 +13,7 @@ class MobileBankingQaApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto',
       ),
+      debugShowCheckedModeBanner: false,
       home: HomeScreen(),
       routes: {
         '/account': (context) => AccountDetailsScreen(),
@@ -23,7 +24,14 @@ class MobileBankingQaApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  double balance = 1000.00;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +51,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             Card(
               color: Colors.grey[200],
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   children: [
@@ -53,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.black54,
                         )),
                     SizedBox(height: 8),
-                    Text('\$1,000.00',
+                    Text('\$${balance.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -71,8 +79,13 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/transfer');
+              onPressed: () async {
+                final result = await Navigator.pushNamed(context, '/transfer');
+                if (result != null && result is double) {
+                  setState(() {
+                    balance -= result;
+                  });
+                }
               },
               child: const Text('Transfer Funds'),
             ),
@@ -85,28 +98,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance),
-            label: 'Account',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushNamed(context, '/account');
-          }
-        },
       ),
     );
   }
@@ -126,18 +117,12 @@ class AccountDetailsScreen extends StatelessWidget {
           children: [
             Text('Account Number: 123456789',
                 style: TextStyle(fontSize: 18, color: Colors.black54)),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Text('Account Type: Savings',
                 style: TextStyle(fontSize: 18, color: Colors.black54)),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Navigator.pop(context);
-              },
+              onPressed: () {},
               child: Text('Edit Account Details'),
             )
           ],
@@ -147,42 +132,85 @@ class AccountDetailsScreen extends StatelessWidget {
   }
 }
 
-class TransferFundsScreen extends StatelessWidget {
+class TransferFundsScreen extends StatefulWidget {
+  @override
+  _TransferFundsScreenState createState() => _TransferFundsScreenState();
+}
+
+class _TransferFundsScreenState extends State<TransferFundsScreen> {
+  final TextEditingController accountController = TextEditingController();
+  final TextEditingController amountController = TextEditingController();
+  String errorMessage = '';
+
+  void transferFunds() {
+    String account = accountController.text.trim();
+    String amountText = amountController.text.trim();
+
+    if (account.isEmpty || amountText.isEmpty) {
+      setState(() {
+        errorMessage = 'All fields are required!';
+      });
+      return;
+    }
+
+    double? amount = double.tryParse(amountText);
+    if (amount == null || amount <= 0) {
+      setState(() {
+        errorMessage = 'Invalid amount!';
+      });
+      return;
+    }
+
+    if (amount > 1000.00) {
+      // Assume balance is $1000
+      setState(() {
+        errorMessage = 'Insufficient balance!';
+      });
+      return;
+    }
+
+    Navigator.pop(context, amount);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Transfer Funds', style: TextStyle(fontSize: 24)),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                  decoration: InputDecoration(
+      appBar: AppBar(
+        title: Text('Transfer Funds', style: TextStyle(fontSize: 24)),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: accountController,
+              decoration: InputDecoration(
                 labelText: "Recipient's Account Number",
                 labelStyle: TextStyle(fontSize: 18, color: Colors.black54),
-              )),
-              SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: "Amount",
-                  labelStyle: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
               ),
-              SizedBox(
-                height: 20,
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Amount",
+                labelStyle: TextStyle(fontSize: 18, color: Colors.black54),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigator.pop(context);
-                },
-                child: Text('Transfer Funds'),
-              )
-            ],
-          ),
-        ));
+            ),
+            SizedBox(height: 10),
+            if (errorMessage.isNotEmpty)
+              Text(errorMessage, style: TextStyle(color: Colors.red)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: transferFunds,
+              child: Text('Transfer Funds'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -196,17 +224,20 @@ class TransactionHistoryScreen extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-              title: Text('Transaction 1', style: TextStyle(fontSize: 18)),
+              title:
+                  Text('Transfer to 987654321', style: TextStyle(fontSize: 18)),
               subtitle:
                   Text('Amount: \$100', style: TextStyle(color: Colors.red))),
           ListTile(
-              title: Text('Transaction 2', style: TextStyle(fontSize: 19)),
+              title: Text('Received from 123456789',
+                  style: TextStyle(fontSize: 19)),
               subtitle:
                   Text('Amount: \$200', style: TextStyle(color: Colors.green))),
           ListTile(
-              title: Text('Transaction 3', style: TextStyle(fontSize: 17)),
-              subtitle: Text('Amount: \$300',
-                  style: TextStyle(color: Colors.purple))),
+              title:
+                  Text('Transfer to 555666777', style: TextStyle(fontSize: 17)),
+              subtitle:
+                  Text('Amount: \$300', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
