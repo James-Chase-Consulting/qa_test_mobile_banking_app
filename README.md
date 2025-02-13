@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-This document outlines the test plan for the fintech mobile wallet application [Download here](https://i.diawi.com/p6w66P):. The objective is to ensure that the app functions correctly by performing manual and automated testing of its core features.
+This document outlines the test plan for the fintech mobile wallet application [Download here](https://drive.google.com/file/d/1JcZNAZ_d6swpZLu5wwCFPkS3Vfr2UWHt/view?usp=drive_link):. The objective is to ensure that the app functions correctly by performing manual and automated testing of its core features.
 
 ## 2. Scope
 
